@@ -52,3 +52,19 @@ class LevelJsonDict(LevelDict):
     def rangescan(self, start=None, end=None):
         for k, v in LevelDict.rangescan(self, start, end):
             yield k, json.loads(v)
+
+class LevelPickleDict(LevelDict):
+    """Dict Wrapper around the Google LevelDB Database with Pickle serialization"""
+    def __getitem__(self, key):
+        return pickle.loads(LevelDict.__getitem__(self, key))
+
+    def __setitem__(self, key, value):
+        LevelDict.__setitem__(self, key, pickle.dumps(value,protocol=2))
+
+    def iteritems(self):
+        for k, v in LevelDict.iteritems(self):
+            yield k, pickle.loads(v)
+
+    def rangescan(self, start=None, end=None):
+        for k, v in LevelDict.rangescan(self, start, end):
+            yield k, pickle.loads(v)
